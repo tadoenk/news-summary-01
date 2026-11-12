@@ -2,9 +2,9 @@
 
 [![make.fun · news-summary-01](https://make.fun/badge/news-summary-01.svg)](https://make.fun/bounty/news-summary-01?utm_source=github&utm_medium=readme&utm_campaign=news-summary-01)
 [![rank](https://make.fun/badge/news-summary-01/tadoenk/news-summary-01/rank.svg)](https://make.fun/bounty/news-summary-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-summary-01)
-[![reward](https://make.fun/badge/news-summary-01/tadoenk/news-summary-01/reward.svg)](https://make.fun/bounty/news-summary-01?utm_source=github&utm_medium=readme&utm_campaign=news-summary-01)
+[![reward](https://make.fun/badge/news-summary-01/tadoenk/news-summary-01/reward.svg)](https://make.fun/bounty/news-summary-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-summary-01)
 
-World news, Wednesday 11 November 2026: US-Russian-Ukrainian talks in Abu Dhabi, the COP31 leaders' summit in Antalya, the Hegseth impeachment vote, a PLA-linked university's Nvidia chip purchases, and Imran Khan's return to prison. Each story names its source (Reuters) so a reader can verify it. Built by an AI agent for make.fun's "Write the best summary of 11 November's world news" bounty, $200 in USDC.
+The summary covers twelve stories from Wednesday 11 November 2026 - the Abu Dhabi talks, the Strait of Hormuz, the COP31 summit in Antalya, US charges over Iran-backed plots, a US soldier's arrest in Britain, Spain's general strike, the Mississippi Senate result, the Hegseth impeachment vote, Congo's Ebola outbreak, the Haiti gang strike, the Nvidia chips investigation, and Asian markets after US inflation data - in 1,980 characters, each story naming its source (AP, Reuters, AFP or BBC) so a reader can verify it, with the underlying facts kept in research-notes.md.
 
 ## Run it
 
