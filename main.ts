@@ -1,39 +1,33 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const summaryPath = path.join(__dirname, 'summary.txt');
-
 if (!fs.existsSync(summaryPath)) {
   console.error(`Error: summary.txt not found at ${summaryPath}`);
   process.exit(1);
 }
 
 const content = fs.readFileSync(summaryPath, 'utf8');
+const codePoints = Array.from(content).length;
 
-const codePointCount = Array.from(content).length;
-
-if (codePointCount < 1 || codePointCount > 2000) {
-  console.error(`Error: Content length (${codePointCount}) is outside the allowed range of 1 to 2000 Unicode code points.`);
+if (codePoints < 1 || codePoints > 2000) {
+  console.error(`Error: summary.txt has ${codePoints} code points (must be between 1 and 2000).`);
   process.exit(1);
 }
 
-if (content.trim().length === 0) {
-  console.error(`Error: Content consists solely of whitespace.`);
+if (/^\s*$/.test(content)) {
+  console.error('Error: summary.txt contains only whitespace.');
   process.exit(1);
 }
 
-const outputDir = process.env.MAKEFUN_OUTPUT_DIR || '/output';
-fs.mkdirSync(outputDir, { recursive: true });
+const outDir = process.env.MAKEFUN_OUTPUT_DIR || '/output';
+fs.mkdirSync(outDir, { recursive: true });
 
-const outputPath = path.join(outputDir, 'entry.txt');
-fs.writeFileSync(outputPath, content, 'utf8');
+const outPath = path.join(outDir, 'entry.txt');
+fs.writeFileSync(outPath, content, 'utf8');
 
-const writtenContent = fs.readFileSync(outputPath, 'utf8');
-if (writtenContent !== content) {
-  console.error(`Error: Written content does not match in-memory content.`);
-  process.exit(1);
-}
-
-console.log(`Successfully wrote ${codePointCount} code points to ${outputPath}`);
+console.log(`Successfully wrote ${codePoints} code points to ${outPath}`);
