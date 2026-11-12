@@ -6,34 +6,78 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const summaryPath = path.join(__dirname, 'summary.txt');
 
 if (!fs.existsSync(summaryPath)) {
-  console.error(`Error: summary.txt not found at ${summaryPath}`);
+  console.error(`Error: summary.txt is missing at path: ${summaryPath}`);
   process.exit(1);
 }
 
-const content = fs.readFileSync(summaryPath, 'utf8');
+let sourceBytes: Buffer;
+try {
+  sourceBytes = fs.readFileSync(summaryPath);
+} catch (err: any) {
+  console.error(`Error: Failed to read summary.txt: ${err.message}`);
+  process.exit(1);
+}
 
-const codePointCount = Array.from(content).length;
+// BOM guard: check for UTF-8 BOM (0xEF 0xBB 0xBF)
+if (sourceBytes.length >= 3 && sourceBytes[0] === 0xEF && sourceBytes[1] === 0xBB && sourceBytes[2] === 0xBF) {
+  console.error('Error: summary.txt starts with a UTF-8 BOM.');
+  process.exit(1);
+}
 
-if (codePointCount < 1 || codePointCount > 2000) {
-  console.error(`Error: Content length (${codePointCount}) is outside the allowed range of 1 to 2000 Unicode code points.`);
+let content: string;
+try {
+  const decoder = new TextDecoder('utf-8', { fatal: true });
+  content = decoder.decode(sourceBytes);
+} catch (err: any) {
+  console.error(`Error: summary.txt is not valid UTF-8: ${err.message}`);
+  process.exit(1);
+}
+
+// Line-ending guard: check for carriage returns (\r)
+if (content.includes('\r')) {
+  console.error('Error: summary.txt contains carriage returns / non-LF line endings.');
   process.exit(1);
 }
 
 if (content.trim().length === 0) {
-  console.error(`Error: Content consists solely of whitespace.`);
+  console.error('Error: summary.txt content is empty or contains only whitespace.');
+  process.exit(1);
+}
+
+const charCount = content.length;
+if (charCount < 1 || charCount > 2000) {
+  console.error(`Error: summary.txt character count (${charCount}) is outside the permitted 1..2000 range.`);
   process.exit(1);
 }
 
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR || '/output';
-fs.mkdirSync(outputDir, { recursive: true });
-
 const outputPath = path.join(outputDir, 'entry.txt');
-fs.writeFileSync(outputPath, content, 'utf8');
 
-const writtenContent = fs.readFileSync(outputPath, 'utf8');
-if (writtenContent !== content) {
-  console.error(`Error: Written content does not match in-memory content.`);
+try {
+  fs.mkdirSync(outputDir, { recursive: true });
+} catch (err: any) {
+  console.error(`Error: Failed to create output directory ${outputDir}: ${err.message}`);
   process.exit(1);
 }
 
-console.log(`Successfully wrote ${codePointCount} code points to ${outputPath}`);
+try {
+  fs.writeFileSync(outputPath, sourceBytes);
+} catch (err: any) {
+  console.error(`Error: Failed to write entry.txt to ${outputPath}: ${err.message}`);
+  process.exit(1);
+}
+
+let writtenBytes: Buffer;
+try {
+  writtenBytes = fs.readFileSync(outputPath);
+} catch (err: any) {
+  console.error(`Error: Failed to read back entry.txt from ${outputPath}: ${err.message}`);
+  process.exit(1);
+}
+
+if (!sourceBytes.equals(writtenBytes)) {
+  console.error('Error: Byte mismatch between source summary.txt and written entry.txt.');
+  process.exit(1);
+}
+
+console.log(`Success: entry.txt written successfully. Character count: ${charCount}`);
